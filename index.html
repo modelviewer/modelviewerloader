@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Karla:ital,wght@0,200..800;1,200..800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    />
+
+    <title>Model Viewer loader</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="other/toast.css" />
+    <script src="main.js" defer></script>
+    <script src="other/toast.js" defer></script>
+    <script src="other/storage.js" defer></script>
+    <script src="other/loadingScreen.js" defer></script>
+      </head>
+  <body>
+    <div id="body-wrapper">
+      <main id="main-container">
+        <div id="logo">
+          <img src="images/logo.png" alt="logo" />
+        </div>
+
+        <div id="drop-zone-wrapper">
+          <div id="drop-zone" class="">
+            <div class="no-drag">
+              <img src="images/icon-upload.png" alt="upload" />
+              <p>Drag & Drop a <span class="bold">.dxf</span> file here</p>
+              <p>or</p>
+            </div>
+            <button id="btn-browse" class="btn-outlined">Browse File</button>
+            <input
+              type="file"
+              id="file-input"
+              accept=".dxf"
+              style="display: none"
+              multiple
+            />
+          </div>
+
+          <div id="loading-screen" class="hide">
+            <p id="loading-bar-label"></p>
+            <div id="loading-bar">
+              <div id="loading-bar-fill"></div>
+            </div>
+            <P id="fun-fact"></P>
+        </div>
+
+        <button id="btn-summon-aside-auth"></button>
+
+        <!-- toast -->
+        <ul class="notifications"></ul>
+      </main>
+
+      <aside id="user-auth-container">
+        <form id="user-auth-form">
+          <div class="form-element-wrapper">
+            <div class="tooltip">
+              <label for="auth-username">Username</label>
+              <span class="tooltiptext">GitHub username</span>
+            </div>
+            <input
+              type="text"
+              id="auth-username"
+              name="auth-username"
+              required
+            />
+          </div>
+          <div class="form-element-wrapper">
+            <div class="tooltip">
+              <label for="auth-token">Token</label><br />
+              <span class="tooltiptext"
+                >GitHub fine-grained personal access token</span
+              >
+            </div>
+            <input type="text" id="auth-token" name="auth-token" required />
+          </div>
+        </form>
+          <button id="btn-help" class="btn-outlined" onclick="window.open(`https://github.com/Fuyutami/modelviewer`, '_blank')">Help</button>
+      </aside>
+    </div>
+  </body>
+</html>
