@@ -1,3 +1,2 @@
 
-Nightstand demo
 staircase for testing
