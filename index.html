@@ -22,6 +22,8 @@
     <script src="other/toast.js" defer></script>
     <script src="other/storage.js" defer></script>
     <script src="other/loadingScreen.js" defer></script>
+    <script src="other/projectsPanel.js" defer></script>
+    <script src="other/api.js" defer></script>
       </head>
   <body>
     <div id="body-wrapper">
@@ -55,7 +57,11 @@
             <P id="fun-fact"></P>
         </div>
 
-        <button id="btn-summon-aside-auth"></button>
+        <button id="btn-summon-aside-auth">
+          <div id="status-icon">
+            <img id="status-icon-img" src="images/icon-x.png" alt="auth" />
+          </div>
+        </button>
 
         <!-- toast -->
         <ul class="notifications"></ul>
@@ -85,7 +91,14 @@
             <input type="text" id="auth-token" name="auth-token" required />
           </div>
         </form>
-          <button id="btn-help" class="btn-outlined" onclick="window.open(`https://github.com/Fuyutami/modelviewer`, '_blank')">Help</button>
+          <div id="projects-panel" class="hide">
+            <div id="projects-panel-header">
+              <p>PROJECTS</p>
+            </div>
+            <ul id="projects-list">
+              
+            </ul>
+            </div>
       </aside>
     </div>
   </body>

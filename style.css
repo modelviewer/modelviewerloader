@@ -199,6 +199,23 @@ aside {
   transform: scale(0.8);
 }
 
+#status-icon {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: -5px;
+  bottom: -5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--error);
+}
+
+#status-icon img {
+  width: 8px;
+}
+
 #btn-summon-aside-auth:hover {
   cursor: pointer;
   filter: brightness(1.2);
@@ -214,6 +231,7 @@ aside {
   background-color: #131313;
   display: flex;
   flex-direction: column;
+  gap: 80px;
   padding: 40px;
 }
 
@@ -265,6 +283,89 @@ input:-webkit-autofill:active {
 
 input:-webkit-autofill {
   -webkit-text-fill-color: rgb(255, 255, 255) !important;
+}
+
+#projects-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#projects-panel-header {
+  margin-bottom: 20px;
+}
+#projects-panel-header p {
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: #918f8f;
+}
+
+#projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  list-style-type: none;
+}
+
+#projects-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style-type: none;
+  position: relative;
+}
+
+#projects-list li p {
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.spinner {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  transform: translate(7px, -7px);
+}
+
+.spinner-wheel {
+  width: 100%;
+  position: absolute;
+  /* width: 100%; */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-fill {
+  position: absolute;
+  width: 100%;
+  animation: spin 1s linear infinite;
+}
+
+.btn-delete-project {
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  position: relative;
+}
+
+.btn-delete-project:hover img {
+  filter: brightness(10);
+}
+
+.btn-delete-project:active {
+  transform: scale(0.9);
 }
 
 /* tooltip */

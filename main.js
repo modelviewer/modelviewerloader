@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let projectName = ""
   let auth = undefined
   const CHUNK_SIZE = 20 * 1024 * 1024 // 20MB
-  let additionalCleaning = true
+  // let additionalCleaning = true
   let loading = false
   let progress = {
     current: 0,
@@ -34,7 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleLoadingScreen()
 
     for (const [idx, file] of Array.from(files).entries()) {
-      loadingBarLabel.innerText = `Uploading ${idx + 1} of ${files.length}...`
+      loadingBarLabel.innerText = `Uploading ${idx + 1} of ${
+        files.length
+      }... Please wait :)`
       await handleFile(file)
     }
 
@@ -43,15 +45,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const handleFile = async (file) => {
-    progress.current = 0
+    progress.current = 0.1
     progress.total = 1
     setProgress(progress)
 
     owner = githubUsername.value
     auth = githubToken.value
-    additionalCleaning = true
+    // additionalCleaning = true
     // check authorization
-    if (!owner || !auth) {
+    if (!authenticated) {
       showToast(
         "In order to upload projects, you need to provide your authentication details.",
         "error"
@@ -89,60 +91,87 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         const message = `Upload chunk ${i + 1} of ${totalChunks}`
 
+        // await uploadFileToGitHub(
+        //   `${projectName}/Project-Chunk-${i + 1}`,
+        //   message,
+        //   content
+        // )
+
+        let sha = await checkFileSha(
+          `${projectName}/Project-Chunk-${i + 1}`,
+          owner,
+          repo,
+          auth
+        )
         await uploadFileToGitHub(
           `${projectName}/Project-Chunk-${i + 1}`,
+          owner,
+          repo,
+          auth,
           message,
-          content
+          content,
+          sha
         )
+
         progress.current = i + 1
         setProgress(progress)
       }
 
-      // clean up the leftover chunks if any
-      if (additionalCleaning) {
-        await cleanUpLeftoverChunks(totalChunks)
-      }
+      // // clean up the leftover chunks if any
+      // if (additionalCleaning) {
+      //   await cleanUpLeftoverChunks(totalChunks)
+      // }
 
       // update names.txt
-      const namesResponse = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/contents/projects/names.txt`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${auth}`,
-          },
-        }
-      )
+      // const namesResponse = await fetch(
+      //   `https://api.github.com/repos/${owner}/${repo}/contents/projects/names.txt`,
+      //   {
+      //     method: "GET",
+      //     headers: {
+      //       Accept: "application/vnd.github+json",
+      //       Authorization: `Bearer ${auth}`,
+      //     },
+      //   }
+      // )
 
-      if (namesResponse.ok) {
-        const namesFile = await namesResponse.json()
-        const namesContent = atob(namesFile.content)
-        const names = namesContent.split("\n")
-        if (!names.includes(projectName)) {
-          names.push(projectName)
-          const newNamesContent = names.join("\n")
-          const newNamesContentEncoded = btoa(newNamesContent)
-          await uploadFileToGitHub(
-            "names.txt",
-            "Update names.txt",
-            newNamesContentEncoded
-          )
-        }
-      } else {
-        const newNamesContent = projectName
-        const newNamesContentEncoded = btoa(newNamesContent)
-        await uploadFileToGitHub(
-          "names.txt",
-          "Create names.txt",
-          newNamesContentEncoded
-        )
-      }
+      // if (namesResponse.ok) {
+      //   const namesFile = await namesResponse.json()
+      //   const namesContent = atob(namesFile.content)
+      //   const names = namesContent.split("\n")
+      //   if (!names.includes(projectName)) {
+      //     names.push(projectName)
+      //     const newNamesContent = names.join("\n")
+      //     const newNamesContentEncoded = btoa(newNamesContent)
+      //     await uploadFileToGitHub(
+      //       "names.txt",
+      //       "Update names.txt",
+      //       newNamesContentEncoded
+      //     )
+      //   }
+      // } else {
+      //   const newNamesContent = projectName
+      //   const newNamesContentEncoded = btoa(newNamesContent)
+      //   await uploadFileToGitHub(
+      //     "names.txt",
+      //     "Create names.txt",
+      //     newNamesContentEncoded
+      //   )
+      // }
+
+      await updateNamesFile(projectName, owner, repo, auth)
 
       progress.current = progress.total
       setProgress(progress)
+
+      // render projects panel
+      renderProjectsPanel()
+
+      showToast(
+        `Upload complete, ${projectName} is ready for viewing in VR :)`,
+        "success"
+      )
     } else {
-      showToast("Not a .dxf file, aborting.", "error")
+      showToast(`${file.name} in not a .dxf file, uploading aborted.`, "error")
     }
   }
 
@@ -155,127 +184,146 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  const cleanUpLeftoverChunks = async (lastChunkID) => {
-    let chunkID = lastChunkID + 1
-    while (additionalCleaning) {
-      // Check if the file exists
-      let sha
+  // const cleanUpLeftoverChunks = async (lastChunkID) => {
+  //   let chunkID = lastChunkID + 1
+  //   while (additionalCleaning) {
+  //     // Check if the file exists
+  //     let sha = await checkFileSha(
+  //       `${projectName}/Project-Chunk-${chunkID}`,
+  //       owner,
+  //       repo,
+  //       auth
+  //     )
 
-      try {
-        const existingFileResponse = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}/contents/projects/${projectName}/Project-Chunk-${chunkID}`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/vnd.github+json",
-              Authorization: `Bearer ${auth}`,
-            },
-          }
-        )
-        if (existingFileResponse.ok) {
-          const existingFile = await existingFileResponse.json()
-          sha = existingFile.sha
-        } else {
-          // File does not exist, so no sha is needed
-          sha = undefined
-          // no chunks further
-          showToast(`No more chunks left`, "info")
+  //     if (sha === undefined) {
+  //       // no chunks further
+  //       additionalCleaning = false
+  //       return
+  //     }
 
-          additionalCleaning = false
-          return
-        }
-      } catch (error) {
-        // File does not exist, so no sha is needed
-        sha = undefined
-        // no chunks further
-        showToast(`No more chunks left`, "info")
-        additionalCleaning = false
-        return
-      }
+  //     await deleteFileFromGitHub(
+  //       `${projectName}/Project-Chunk-${chunkID}`,
+  //       owner,
+  //       repo,
+  //       auth,
+  //       sha
+  //     )
 
-      // Delete the file
+  //     // try {
+  //     //   const existingFileResponse = await fetch(
+  //     //     `https://api.github.com/repos/${owner}/${repo}/contents/projects/${projectName}/Project-Chunk-${chunkID}`,
+  //     //     {
+  //     //       method: "GET",
+  //     //       headers: {
+  //     //         Accept: "application/vnd.github+json",
+  //     //         Authorization: `Bearer ${auth}`,
+  //     //       },
+  //     //     }
+  //     //   )
+  //     //   if (existingFileResponse.ok) {
+  //     //     const existingFile = await existingFileResponse.json()
+  //     //     sha = existingFile.sha
+  //     //   } else {
+  //     //     // File does not exist, so no sha is needed
+  //     //     sha = undefined
+  //     //     // no chunks further
+  //     //     // showToast(`No more chunks left`, "info")
 
-      const response = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/contents/projects/${projectName}/Project-Chunk-${chunkID}`,
-        {
-          method: "DELETE",
-          headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${auth}`,
-          },
-          body: JSON.stringify({
-            message: `Clean up leftover chunks`,
-            sha: sha,
-          }),
-        }
-      )
+  //     //     additionalCleaning = false
+  //     //     return
+  //     //   }
+  //     // } catch (error) {
+  //     //   // File does not exist, so no sha is needed
+  //     //   sha = undefined
+  //     //   // no chunks further
+  //     //   // showToast(`No more chunks left`, "info")
+  //     //   additionalCleaning = false
+  //     //   return
+  //     // }
 
-      if (response.ok) {
-        // showToast(`Cleaned up leftover chunk`, "info")
-        console.log(`Cleaned up leftover chunk ${chunkID}`)
-      } else {
-        // showToast(`Failed to clean up leftover chunk`, "error")
-        console.log(`Failed to clean up leftover chunk ${chunkID}`)
-      }
+  //     // Delete the file
 
-      chunkID++
-    }
-  }
+  //     // const response = await fetch(
+  //     //   `https://api.github.com/repos/${owner}/${repo}/contents/projects/${projectName}/Project-Chunk-${chunkID}`,
+  //     //   {
+  //     //     method: "DELETE",
+  //     //     headers: {
+  //     //       Accept: "application/vnd.github+json",
+  //     //       Authorization: `Bearer ${auth}`,
+  //     //     },
+  //     //     body: JSON.stringify({
+  //     //       message: `Clean up leftover chunks`,
+  //     //       sha: sha,
+  //     //     }),
+  //     //   }
+  //     // )
 
-  const uploadFileToGitHub = async (path, message, content) => {
-    try {
-      // Check if the file already exists
-      let sha
-      try {
-        const existingFileResponse = await fetch(
-          `https://api.github.com/repos/${owner}/${repo}/contents/projects/${path}`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/vnd.github+json",
-              Authorization: `Bearer ${auth}`,
-            },
-          }
-        )
-        if (existingFileResponse.ok) {
-          const existingFile = await existingFileResponse.json()
-          sha = existingFile.sha
-        }
-      } catch (error) {
-        // File does not exist, so no sha is needed
-        sha = undefined
-        // no chunks further, so no need to clean up
-        additionalCleaning = false
-      }
+  //     // if (response.ok) {
+  //     //   // showToast(`Cleaned up leftover chunk`, "info")
+  //     //   console.log(`Cleaned up leftover chunk ${chunkID}`)
+  //     // } else {
+  //     //   // showToast(`Failed to clean up leftover chunk`, "error")
+  //     //   console.log(`Failed to clean up leftover chunk ${chunkID}`)
+  //     // }
 
-      // Upload the file
-      const response = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/contents/projects/${path}`,
-        {
-          method: "PUT",
-          headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${auth}`,
-          },
-          body: JSON.stringify({
-            message: message,
-            content: content,
-            sha: sha,
-          }),
-        }
-      )
-      if (response.ok) {
-        // showToast(
-        //   `${fileName} is successfully uploaded and ready for viewing`,
-        //   "success"
-        // )
-      } else {
-        showToast(`Failed to upload ${fileName}`, "error")
-      }
-    } catch (error) {
-      showToast(`Failed to upload ${fileName}`, "error")
-    }
-  }
+  //     chunkID++
+  //   }
+  // }
+
+  // const uploadFileToGitHub = async (path, message, content) => {
+  //   try {
+  //     // Check if the file already exists
+  //     let sha
+  //     try {
+  //       const existingFileResponse = await fetch(
+  //         `https://api.github.com/repos/${owner}/${repo}/contents/projects/${path}`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             Accept: "application/vnd.github+json",
+  //             Authorization: `Bearer ${auth}`,
+  //           },
+  //         }
+  //       )
+  //       if (existingFileResponse.ok) {
+  //         const existingFile = await existingFileResponse.json()
+  //         sha = existingFile.sha
+  //       }
+  //     } catch (error) {
+  //       // File does not exist, so no sha is needed
+  //       sha = undefined
+  //       // no chunks further, so no need to clean up
+  //       additionalCleaning = false
+  //     }
+
+  //     // Upload the file
+  //     const response = await fetch(
+  //       `https://api.github.com/repos/${owner}/${repo}/contents/projects/${path}`,
+  //       {
+  //         method: "PUT",
+  //         headers: {
+  //           Accept: "application/vnd.github+json",
+  //           Authorization: `Bearer ${auth}`,
+  //         },
+  //         body: JSON.stringify({
+  //           message: message,
+  //           content: content,
+  //           sha: sha,
+  //         }),
+  //       }
+  //     )
+  //     if (response.ok) {
+  //       // showToast(
+  //       //   `${fileName} is successfully uploaded and ready for viewing`,
+  //       //   "success"
+  //       // )
+  //     } else {
+  //       showToast(`Failed to upload ${fileName}`, "error")
+  //     }
+  //   } catch (error) {
+  //     showToast(`Failed to upload ${fileName}`, "error")
+  //   }
+  // }
 
   // listeners
   authButton.addEventListener("click", () => {
