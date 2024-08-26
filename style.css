@@ -183,6 +183,9 @@ aside {
   width: min-content;
   align-self: flex-start;
   margin-top: 40px;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
 }
 
 #btn-summon-aside-auth {

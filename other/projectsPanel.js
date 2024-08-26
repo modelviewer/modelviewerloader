@@ -5,6 +5,12 @@ const renderProjectsPanel = async () => {
   const projectsList = document.querySelector("#projects-list")
 
   const projectsNames = await getProjectsNames()
+
+  if (!projectsNames) {
+    projectsPanel.classList.add("hide")
+    return
+  }
+
   const projectItems = projectsNames.map((projectName, idx) => {
     return `<li id="project-${idx}" class="project-item">
                 <p>${projectName}</p>
@@ -50,7 +56,7 @@ const getProjectsNames = async () => {
   const inputToken = document.querySelector("#auth-token")
 
   const username = inputName.value
-  const token = inputToken.value
+  const token = getAuth(inputToken.value)
 
   try {
     const existingFileResponse = await fetch(
@@ -81,7 +87,7 @@ const deleteProject = async (projectName) => {
   const inputToken = document.querySelector("#auth-token")
 
   const username = inputName.value
-  const token = inputToken.value
+  const token = getAuth(inputToken.value)
 
   // console.log(`Deleting project: ${projectName}`)
 

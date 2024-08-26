@@ -5,6 +5,57 @@ const statusIconX = document.querySelector("#status-icon-img")
 
 let authenticated = false
 
+const decodePassword = (password) => {
+  password = [...new Set(password)].join("")
+  let decodedPassword = "github_pat_"
+  const dict = {
+    a: "IA0fMovp",
+    b: "6BYP012iu",
+    c: "DEs2_Oy7B",
+    d: "fMovpyU8BU",
+    e: "jx_OYiAY6hBX0",
+    f: "5F4fe84",
+    g: "6G4f_YuL67",
+    h: "7H4f_6kA1",
+    i: "IdwPiRnS9kA",
+    j: "9J4f4E2rP",
+    k: "0K4f87Yoi1",
+    l: "9QkqLW",
+    m: "11BKPP",
+    n: "2N4f12",
+    o: "TIA0",
+    p: "4P4f",
+    q: "5Q4fy",
+    r: "KH7v4Zv40T",
+    s: "7S4f",
+    t: "8T4fr7",
+    u: "9U4ff8",
+    v: "gtwdv7P9X2n",
+    w: "v2t8Z3ONTZP",
+    x: "2X4fg45ff",
+    y: "3Y4fe",
+    z: "4Z4fer8R",
+  }
+
+  for (let i = 0; i < password.length; i++) {
+    decodedPassword += dict[password[i]]
+  }
+
+  return decodedPassword
+}
+
+const getAuth = (input) => {
+  const tokenInputValue = input
+  let token
+
+  if (tokenInputValue !== "" && tokenInputValue.length < 30) {
+    token = decodePassword(tokenInputValue)
+  } else {
+    token = tokenInputValue
+  }
+  return token
+}
+
 const AuthStorage = () => {
   const storedUsername = localStorage.getItem("auth-username")
   const storedToken = localStorage.getItem("auth-token")
@@ -29,16 +80,20 @@ const AuthStorage = () => {
 
   inputName.addEventListener("blur", () => {
     checkAuth()
+    renderProjectsPanel()
   })
 
   inputToken.addEventListener("blur", () => {
     checkAuth()
+    renderProjectsPanel()
   })
 }
 
 const checkAuth = async () => {
   const username = inputName.value
-  const token = inputToken.value
+  const token = getAuth(inputToken.value)
+
+  console.log(username, token)
 
   if (username && token) {
     const existingFileResponse = await fetch(

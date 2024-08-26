@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let owner = undefined
   const repo = "modelviewerloader"
   let projectName = ""
-  let auth = undefined
+  let auth = getAuth(githubToken.value)
   const CHUNK_SIZE = 20 * 1024 * 1024 // 20MB
   // let additionalCleaning = true
   let loading = false
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setProgress(progress)
 
     owner = githubUsername.value
-    auth = githubToken.value
+    auth = getAuth(githubToken.value)
     // additionalCleaning = true
     // check authorization
     if (!authenticated) {
