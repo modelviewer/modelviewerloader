@@ -1,4 +1,4 @@
-#How to use modelviewerloader with modelviewer
+# How to use modelviewerloader with modelviewer
 
 1. Clone this repository
 2. Generate fine-grained token with permissions to read/write modelviewerloader repository
