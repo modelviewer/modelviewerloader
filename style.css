@@ -186,6 +186,7 @@ aside {
   position: absolute;
   right: 20px;
   bottom: 20px;
+  z-index: 0;
 }
 
 #btn-summon-aside-auth {
