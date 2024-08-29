@@ -6,7 +6,7 @@
 
 3. <strong>Provide your Github username and generated token</strong> inside both the modelviewerloader and modelviewer applications
 
-Model Viewer Loader can be accessed [here](https://modelviewerloader.netlify.app/)
+You can either host the Model Viewer Loader yourself (e.g., using GitHub Pages) or access it [here](https://modelviewerloader.netlify.app/)
 <br/>
 Model Viewer application can be downloaded [here](https://github.com/Fuyutami/modelviewer)
 <br/>
