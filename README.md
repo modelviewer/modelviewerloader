@@ -9,3 +9,9 @@
 Model Viewer Loader can be accessed [here](https://modelviewerloader.netlify.app/)
 <br/>
 Model Viewer application can be downloaded [here](https://github.com/Fuyutami/modelviewer)
+<br/>
+## Model Viewer F.A.Q.
+1.  **Loading finishes, but no model is seen?** <br/>
+Make sure that your wi-fi connection is stable and all project geometry is converted to MESH in AutoCAD.<br/>
+2.  **Model scale or location is incorrect?** <br/>
+Make sure units are set correctly in AutoCAD.
