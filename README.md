@@ -15,3 +15,5 @@ Model Viewer application can be downloaded [here](https://github.com/Fuyutami/mo
 Ensure your Wi-Fi connection is stable and all project geometry in AutoCAD is converted to MESH.<br/>
 2.  **Model scale or location incorrect?** <br/>
 Verify that units are set correctly in AutoCAD.
+3.  **Is the model taking too long to load?** <br/>
+To improve loading times, try reducing the size of your DXF file. When converting objects to MESH in AutoCAD using the MESHOPTIONS command, aim to decrease the polygon count. This will help the model load faster. Keep in mind that loading speed can also be affected by your Wi-Fi connection.
